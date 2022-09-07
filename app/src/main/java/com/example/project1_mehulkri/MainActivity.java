@@ -2,6 +2,7 @@ package com.example.project1_mehulkri;
 
 import static com.example.project1_mehulkri.GridFunctions.coordinateToIndex;
 import static com.example.project1_mehulkri.GridFunctions.indexToCoordinate;
+import static com.example.project1_mehulkri.GridFunctions.didWin;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.gridlayout.widget.GridLayout;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int COLUMN_COUNT = 8;
     private static final int ROW_COUNT = 10;
+    private static final int winningNum = COLUMN_COUNT*ROW_COUNT - 4;
 
     // save the TextViews of all cells in an array, so later on,
     // when a TextView is clicked, we know which cell it is
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean[] isVisited = new boolean[COLUMN_COUNT*ROW_COUNT];
     private boolean[] hasFlag = new boolean[COLUMN_COUNT*ROW_COUNT];
     private boolean flagMode = false;
+    private int numFlags = 0;
     // And arrayList that keeps track of which s
 
     @Override
@@ -58,13 +61,10 @@ public class MainActivity extends AppCompatActivity {
                 cell_tvs.add(tv);
             }
         }
-        Button flag = (Button) findViewById(R.id.flagButton);
-        flag.setText(R.string.pick);
-        flag.setTextColor(Color.GRAY);
-        flag.setOnClickListener(this::onClickFlagButton);
-        flag.setBackgroundColor(Color.TRANSPARENT);
-        initializeMines(cell_tvs.size());
 
+        initializeBottomButton();
+        setFlagCount(0);
+        initializeMines(cell_tvs.size());
     }
 
     public void onClickTV(View view) {
@@ -77,8 +77,12 @@ public class MainActivity extends AppCompatActivity {
             if(isVisited[n]) {
                 if(hasFlag[n] == false) {
                     tv.setText(R.string.flag);
+                    setFlagCount(1);
+                    hasFlag[n] = true;
                 } else {
                     tv.setText("");
+                    setFlagCount(-1);
+                    hasFlag[n] = false;
                 }
                 tv.setBackgroundColor(Color.GRAY);
             }
@@ -87,6 +91,9 @@ public class MainActivity extends AppCompatActivity {
                 tv.setTextColor(Color.GRAY);
                 tv.setBackgroundColor(Color.LTGRAY);
                 depthFirstSearch(n);
+                if(didWin(isVisited, randomIndices)) {
+                    finishGame();
+                }
             } else if(adjacentMines[n] == -1) {
                 revealAllMines();
                 finishGame();
@@ -161,8 +168,11 @@ public class MainActivity extends AppCompatActivity {
         }
         randomIndices = new HashSet<>();
         Random rand = new Random();
-        while(randomIndices.size() < 4) {
-            randomIndices.add(rand.nextInt(size));
+//        while(randomIndices.size() < 4) {
+//            randomIndices.add(rand.nextInt(size));
+//        }
+        for(int i=0; i < 4; i++) {
+            randomIndices.add(i);
         }
         randomIndices.forEach(index -> {
             isSquareAMine[index] = true;
@@ -173,8 +183,22 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             String l = e.toString();
         }
+    }
 
+    private void initializeBottomButton() {
+        // Set flag and pick button
+        Button flag = (Button) findViewById(R.id.flagButton);
+        flag.setText(R.string.pick);
+        flag.setTextColor(Color.GRAY);
+        flag.setOnClickListener(this::onClickFlagButton);
+        flag.setBackgroundColor(Color.TRANSPARENT);
+    }
 
+    private void setFlagCount(int up) {
+        numFlags += up;
+        // Set flag and pick button
+        TextView flagCount = (TextView) findViewById(R.id.flagCount);
+        flagCount.setText(String.valueOf(numFlags));
     }
 
     private void finishGame() {
