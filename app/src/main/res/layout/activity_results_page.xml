@@ -4,4 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ResultsPage"/>
+    tools:context=".ResultsPage">
+
+    <TextView
+        android:id="@+id/timeElapsed"
+        android:layout_width="222dp"
+        android:layout_height="37dp"
+        android:layout_marginTop="256dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="TextView"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.534"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+</androidx.constraintlayout.widget.ConstraintLayout>

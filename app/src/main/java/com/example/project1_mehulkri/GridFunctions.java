@@ -1,13 +1,13 @@
 package com.example.project1_mehulkri;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.HashSet;
-import java.util.List;
 
 public class GridFunctions {
 
     private static final int COLUMN_COUNT = 8;
+    private static final int ROW_COUNT = 10;
+    private static final int winningNum = COLUMN_COUNT*ROW_COUNT - 4;
 
     public GridFunctions() {
 
@@ -24,13 +24,27 @@ public class GridFunctions {
         return new Coordinate(i, j);
     }
 
-    public static boolean didWin(boolean[] isVisited, HashSet<Integer> indices) {
+    public static boolean didWin(boolean[] isVisited, HashSet<Integer> indices, int visits) {
         for(int index : indices) {
             if(isVisited[index]) {
                 return false;
             }
         }
-        return true;
+        if(visits == winningNum) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static int numVisited(boolean[] isVisited) {
+        int i = 0;
+        for(boolean visit: isVisited) {
+            if(visit) {
+                i++;
+            }
+        }
+        return i;
     }
 
 

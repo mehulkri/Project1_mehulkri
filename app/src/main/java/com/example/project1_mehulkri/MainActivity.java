@@ -3,6 +3,7 @@ package com.example.project1_mehulkri;
 import static com.example.project1_mehulkri.GridFunctions.coordinateToIndex;
 import static com.example.project1_mehulkri.GridFunctions.indexToCoordinate;
 import static com.example.project1_mehulkri.GridFunctions.didWin;
+import static com.example.project1_mehulkri.GridFunctions.numVisited;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.gridlayout.widget.GridLayout;
@@ -10,6 +11,7 @@ import androidx.gridlayout.widget.GridLayout;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -25,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int COLUMN_COUNT = 8;
     private static final int ROW_COUNT = 10;
-    private static final int winningNum = COLUMN_COUNT*ROW_COUNT - 4;
+    private int clock = 0;
 
     // save the TextViews of all cells in an array, so later on,
     // when a TextView is clicked, we know which cell it is
@@ -36,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean[] isVisited = new boolean[COLUMN_COUNT*ROW_COUNT];
     private boolean[] hasFlag = new boolean[COLUMN_COUNT*ROW_COUNT];
     private boolean flagMode = false;
-    private int numFlags = 0;
+    private int numFlags = 4;
     // And arrayList that keeps track of which s
 
     @Override
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         initializeBottomButton();
         setFlagCount(0);
         initializeMines(cell_tvs.size());
+        runTimer();
     }
 
     public void onClickTV(View view) {
@@ -77,11 +80,11 @@ public class MainActivity extends AppCompatActivity {
             if(isVisited[n]) {
                 if(hasFlag[n] == false) {
                     tv.setText(R.string.flag);
-                    setFlagCount(1);
+                    setFlagCount(-1);
                     hasFlag[n] = true;
                 } else {
                     tv.setText("");
-                    setFlagCount(-1);
+                    setFlagCount(1);
                     hasFlag[n] = false;
                 }
                 tv.setBackgroundColor(Color.GRAY);
@@ -91,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
                 tv.setTextColor(Color.GRAY);
                 tv.setBackgroundColor(Color.LTGRAY);
                 depthFirstSearch(n);
-                if(didWin(isVisited, randomIndices)) {
+                int visits = numVisited(isVisited);
+                if(didWin(isVisited, randomIndices, visits)) {
                     finishGame();
                 }
             } else if(adjacentMines[n] == -1) {
@@ -168,12 +172,13 @@ public class MainActivity extends AppCompatActivity {
         }
         randomIndices = new HashSet<>();
         Random rand = new Random();
-//        while(randomIndices.size() < 4) {
-//            randomIndices.add(rand.nextInt(size));
-//        }
-        for(int i=0; i < 4; i++) {
-            randomIndices.add(i);
+        while(randomIndices.size() < 4) {
+            randomIndices.add(rand.nextInt(size));
         }
+        // Debug
+//        for(int i=0; i < 4; i++) {
+//            randomIndices.add(i);
+//        }
         randomIndices.forEach(index -> {
             isSquareAMine[index] = true;
             adjacentMines[index] = -1;
@@ -237,6 +242,31 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
+            }
+        });
+    }
+
+    private void runTimer() {
+        final TextView timeView = (TextView) findViewById(R.id.time);
+        final Handler handler = new Handler();
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                int hours =clock/3600;
+                int minutes = (clock%3600) / 60;
+                int seconds = clock%60;
+                String time;
+                if(hours > 0) {
+                    time =  String.format("%d:%02d:%02d", hours, minutes, seconds);
+                } else if(minutes > 0) {
+                    time = String.format("%02d:%02d", minutes, seconds);
+                } else {
+                    time = String.format("%02d", seconds);
+                }
+                timeView.setText(time);
+                clock++;
+                handler.postDelayed(this, 1000);
             }
         });
     }
