@@ -73,11 +73,10 @@ public class MainActivity extends AppCompatActivity {
     public void onClickTV(View view) {
         TextView tv = (TextView) view;
         int n = findIndexOfCellTextView(tv);
-        isVisited[n] = true;
         tv.setText(String.valueOf(adjacentMines[n]));
         // First touch
         if(flagMode) {
-            if(isVisited[n]) {
+            if(!isVisited[n]) {
                 if(hasFlag[n] == false) {
                     tv.setText(R.string.flag);
                     setFlagCount(-1);
@@ -90,17 +89,18 @@ public class MainActivity extends AppCompatActivity {
                 tv.setBackgroundColor(Color.GRAY);
             }
         } else {
+            isVisited[n] = true;
             if (adjacentMines[n] == 0) {
                 tv.setTextColor(Color.GRAY);
                 tv.setBackgroundColor(Color.LTGRAY);
                 depthFirstSearch(n);
                 int visits = numVisited(isVisited);
                 if(didWin(isVisited, randomIndices, visits)) {
-                    finishGame();
+                    finishGame(true);
                 }
             } else if(adjacentMines[n] == -1) {
                 revealAllMines();
-                finishGame();
+                finishGame(false);
             } else if (tv.getCurrentTextColor() == Color.GRAY) {
                 tv.setTextColor(Color.GREEN);
                 tv.setBackgroundColor(Color.parseColor("lime"));
@@ -140,6 +140,9 @@ public class MainActivity extends AppCompatActivity {
                         displaySquareNumber(newIndex);
                         if(adjacentMines[newIndex] == 0 && isVisited[newIndex] == false ) {
                             dfsRecursive(newIndex, isVisited);
+                        }
+                        if(adjacentMines[newIndex] > 0 && isVisited[newIndex] == false) {
+                            isVisited[newIndex] = true;
                         }
                     }
                 }
@@ -206,12 +209,15 @@ public class MainActivity extends AppCompatActivity {
         flagCount.setText(String.valueOf(numFlags));
     }
 
-    private void finishGame() {
+    private void finishGame(boolean won) {
+        int finalTime = clock;
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 Intent intent = new Intent(MainActivity.this, ResultsPage.class );
+                intent.putExtra("elapsedTime", finalTime);
+                intent.putExtra("win", won);
                 startActivity(intent);
             }
         }, 3000);
