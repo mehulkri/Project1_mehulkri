@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         cell_tvs = new ArrayList<>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setTitle("CS 310                                Mehul Krishna");
         GridLayout grid = (GridLayout) findViewById(R.id.board);
         LayoutInflater li = LayoutInflater.from(this);
         for (int i = 0; i<=9; i++) {
@@ -89,24 +90,41 @@ public class MainActivity extends AppCompatActivity {
                 tv.setBackgroundColor(Color.GRAY);
             }
         } else {
-            isVisited[n] = true;
+            if(hasFlag[n] == false) {
+                isVisited[n] = true;
+            }
             if (adjacentMines[n] == 0) {
-                tv.setTextColor(Color.GRAY);
-                tv.setBackgroundColor(Color.LTGRAY);
-                depthFirstSearch(n);
-                int visits = numVisited(isVisited);
-                if(didWin(isVisited, randomIndices, visits)) {
-                    finishGame(true);
+                if(hasFlag[n] == false) {
+                    tv.setTextColor(Color.GRAY);
+                    tv.setBackgroundColor(Color.LTGRAY);
+                    depthFirstSearch(n);
+                    int visits = numVisited(isVisited);
+                    if(didWin(isVisited, randomIndices, visits)) {
+                        finishGame(true);
+                    }
+                } else {
+                    tv.setText(R.string.flag);
                 }
             } else if(adjacentMines[n] == -1) {
-                revealAllMines();
-                finishGame(false);
+                if(hasFlag[n] == false) {
+                    revealAllMines();
+                    finishGame(false);
+                } else {
+                    tv.setText(R.string.flag);
+                }
             } else if (tv.getCurrentTextColor() == Color.GRAY) {
-                tv.setTextColor(Color.GREEN);
-                tv.setBackgroundColor(Color.parseColor("lime"));
+                if(hasFlag[n] == false) {
+                    displaySquareNumber(n);
+                } else {
+                    tv.setText(R.string.flag);
+                }
             } else {
-                tv.setTextColor(Color.GRAY);
-                tv.setBackgroundColor(Color.LTGRAY);
+                if(hasFlag[n] == false) {
+                    tv.setTextColor(Color.GRAY);
+                    tv.setBackgroundColor(Color.LTGRAY);
+                } else {
+                    tv.setText(R.string.flag);
+                }
             }
         }
     }
@@ -154,7 +172,11 @@ public class MainActivity extends AppCompatActivity {
         TextView tv = cell_tvs.get(index);
         tv.setTextColor(Color.GRAY);
         tv.setBackgroundColor(Color.LTGRAY);
-        tv.setText(String.valueOf(adjacentMines[index]));
+        if(adjacentMines[index] > 0 && hasFlag[index] == false) {
+            tv.setText(String.valueOf(adjacentMines[index]));
+        } else {
+            tv.setText(" ");
+        }
     }
 
     private int findIndexOfCellTextView(TextView tv) {

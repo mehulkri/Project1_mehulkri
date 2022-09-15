@@ -14,6 +14,7 @@ public class ResultsPage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results_page);
+        getSupportActionBar().setTitle("CS 310                                Mehul Krishna");
         Intent intent = getIntent();
         // Set time
         int elpasedTime = intent.getIntExtra("elapsedTime", 0);
