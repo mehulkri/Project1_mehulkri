@@ -74,7 +74,9 @@ public class MainActivity extends AppCompatActivity {
     public void onClickTV(View view) {
         TextView tv = (TextView) view;
         int n = findIndexOfCellTextView(tv);
-        tv.setText(String.valueOf(adjacentMines[n]));
+        if(adjacentMines[n] > 0) {
+            tv.setText(String.valueOf(adjacentMines[n]));
+        }
         // First touch
         if(flagMode) {
             if(!isVisited[n]) {
@@ -115,6 +117,9 @@ public class MainActivity extends AppCompatActivity {
             } else if (tv.getCurrentTextColor() == Color.GRAY) {
                 if(hasFlag[n] == false) {
                     displaySquareNumber(n);
+                    if(didWin(isVisited, randomIndices,  numVisited(isVisited))) {
+                        finishGame(true);
+                    }
                 } else {
                     tv.setText(R.string.flag);
                 }
@@ -172,9 +177,11 @@ public class MainActivity extends AppCompatActivity {
         TextView tv = cell_tvs.get(index);
         tv.setTextColor(Color.GRAY);
         tv.setBackgroundColor(Color.LTGRAY);
-        if(adjacentMines[index] > 0 && hasFlag[index] == false) {
+        if (adjacentMines[index] > 0 && hasFlag[index] == false) {
             tv.setText(String.valueOf(adjacentMines[index]));
-        } else {
+        } else if(adjacentMines[index] == 0) {
+            tv.setText(" ");
+        }else {
             tv.setText(" ");
         }
     }
